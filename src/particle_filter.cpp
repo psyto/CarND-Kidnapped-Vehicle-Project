@@ -25,35 +25,41 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
 	// Add random Gaussian noise to each particle.
 	// NOTE: Consult particle_filter.h for more information about this method (and others in this file).
 
-//	struct Particle {
-//
-//		int id;
-//		double x;
-//		double y;
-//		double theta;
-//		double weight;
-//		std::vector<int> associations;
-//		std::vector<double> sense_x;
-//		std::vector<double> sense_y;
-//	};
+	//	struct Particle {
+	//
+	//		int id;
+	//		double x;
+	//		double y;
+	//		double theta;
+	//		double weight;
+	//		std::vector<int> associations;
+	//		std::vector<double> sense_x;
+	//		std::vector<double> sense_y;
+	//	};
 
 	// Number of particles to draw
-//	int num_particles;
+	//	int num_particles;
 
 	// Flag, if filter is initialized
-//	bool is_initialized;
+	//	bool is_initialized;
 
 	// Vector of weights of all particles
-//	std::vector<double> weights;
+	//	std::vector<double> weights;
 
-// Set the number of particles.
+	// Set the number of particles.
+	num_particles = 0;
 
+	// Initialize all particles to first position (based on estimates of x, y, theta and their uncertainties from GPS) and all weights to 1.
+	// Add random Gaussian noise to each particle.
+	for (int i=0; i<num_particles; i++)
+	{
+		particles[i].x = x + std[];
+		particles[i].y = y = std[];
+		particles[i].theta = theta + std[];
+		particles[i].weight = 1;
+	}
 
-// Initialize all particles to first position (based on estimates of x, y, theta and their uncertainties from GPS) and all weights to 1.
-
-
-// Add random Gaussian noise to each particle.
-
+		is_initialized = true;
 
 }
 
