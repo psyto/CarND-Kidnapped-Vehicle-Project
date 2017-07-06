@@ -37,29 +37,43 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
 	//		std::vector<double> sense_y;
 	//	};
 
-	// Number of particles to draw
-	//	int num_particles;
-
-	// Flag, if filter is initialized
-	//	bool is_initialized;
-
-	// Vector of weights of all particles
-	//	std::vector<double> weights;
-
 	// Set the number of particles.
-	num_particles = 0;
+	// Number of particles to draw
+	// int num_particles;
+	num_particles = 100;
+
+	particles.resize(num_particles);
+	weights.resize(num_particles);
+
+	double std_x = std[0];
+	double std_y = std[1];
+	double std_theta = std[2];
+
+	normal_distribution<double> dist_x(x, std_x);
+	normal_distribution<double> dist_y(y, std_y);
+	normal_distribution<double> dist_theta(theta, std_theta);
+
+	default_random_engine gen;
 
 	// Initialize all particles to first position (based on estimates of x, y, theta and their uncertainties from GPS) and all weights to 1.
 	// Add random Gaussian noise to each particle.
+	// Vector of weights of all particles
+	// std::vector<double> weights;
 	for (int i=0; i<num_particles; i++)
 	{
-		particles[i].x = x + std[];
-		particles[i].y = y = std[];
-		particles[i].theta = theta + std[];
-		particles[i].weight = 1;
+		Particle p;
+		p.id = i;
+		p.x = dist_x(gen);
+		p.y = dist_y(gen);
+		p.theta = dist_theta(gen);
+		p.weight = 1;
+		particles[i] = p;
+		weights[i] = p.weight;
 	}
 
-		is_initialized = true;
+	// Flag, if filter is initialized
+	// bool is_initialized;
+	is_initialized = true;
 
 }
 
@@ -69,13 +83,27 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 	//  http://en.cppreference.com/w/cpp/numeric/random/normal_distribution
 	//  http://www.cplusplus.com/reference/random/default_random_engine/
 
-	// Add measurements to each particle.
+	double std_x = std_pos[0];
+	double std_y = std_pos[1];
+	double std_theta = std_pos[2];
 
-
-	// Add random Gaussian noise.
 	// std::normal_distribution
-	// std::default_random_engine
+	normal_distribution<double> dist_x(0, std_x);
+	normal_distribution<double> dist_y(0, std_y);
+	normal_distribution<double> dist_theta(0, std_theta);
 
+	// std::default_random_engine
+	default_random_engine gen;
+
+	// Add measurements to each particle.
+	for (int i=0; i<num_particles; i++)
+	{
+
+
+		// Add random Gaussian noise.
+
+
+	}
 
 }
 
@@ -107,7 +135,10 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 	//   http://planning.cs.uiuc.edu/node99.html
 
 	// Update the weights of each particle using a mult-variate Gaussian distribution.
+	for (int i=0; i<num_particles; i++)
+	{
 
+	}
 
 }
 
@@ -118,6 +149,10 @@ void ParticleFilter::resample() {
 
 	// Resample particles with replacement with probability proportional to their weight.
 	// std::discrete_distribution
+	for (int i=0; i<num_particles; i++)
+	{
+
+	}
 
 }
 
