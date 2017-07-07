@@ -42,16 +42,9 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
 	// int num_particles;
 	num_particles = 100;
 
-	particles.resize(num_particles);
-	weights.resize(num_particles);
-
-	double std_x = std[0];
-	double std_y = std[1];
-	double std_theta = std[2];
-
-	normal_distribution<double> dist_x(x, std_x);
-	normal_distribution<double> dist_y(y, std_y);
-	normal_distribution<double> dist_theta(theta, std_theta);
+	normal_distribution<double> dist_x(x, std[0]);
+	normal_distribution<double> dist_y(y, std[1]);
+	normal_distribution<double> dist_theta(theta, std[2]);
 
 	default_random_engine gen;
 
@@ -67,8 +60,8 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
 		p.y = dist_y(gen);
 		p.theta = dist_theta(gen);
 		p.weight = 1;
-		particles[i] = p;
-		weights[i] = p.weight;
+		particles.push_back(p);
+		weights.push_back(p.weight);
 	}
 
 	// Flag, if filter is initialized
@@ -83,14 +76,10 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 	//  http://en.cppreference.com/w/cpp/numeric/random/normal_distribution
 	//  http://www.cplusplus.com/reference/random/default_random_engine/
 
-	double std_x = std_pos[0];
-	double std_y = std_pos[1];
-	double std_theta = std_pos[2];
-
 	// std::normal_distribution
-	normal_distribution<double> dist_x(0, std_x);
-	normal_distribution<double> dist_y(0, std_y);
-	normal_distribution<double> dist_theta(0, std_theta);
+	normal_distribution<double> dist_x(0, std_pos[0]);
+	normal_distribution<double> dist_y(0, std_pos[1]);
+	normal_distribution<double> dist_theta(0, std_pos[3]);
 
 	// std::default_random_engine
 	default_random_engine gen;
