@@ -59,7 +59,7 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
 		p.x = dist_x(gen);
 		p.y = dist_y(gen);
 		p.theta = dist_theta(gen);
-		p.weight = 1;
+		p.weight = 1.0;
 		particles.push_back(p);
 		weights.push_back(p.weight);
 	}
@@ -88,9 +88,22 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 	for (int i=0; i<num_particles; i++)
 	{
 
+		if (yaw_rate == 0)
+		{
+			particles[i].x = particles[i].x + velocity * delta_t * cos(particles[i].theta);
+			particles[i].y = particles[i].y + velocity * delta_t * sin(particles[i].theta);
+		}
+		else
+		{
+			particles[i].x = particles[i].x + velocity/yaw_rate*(sin(particles[i].theta+yaw_rate*delta_t)-sin(particles[i].theta));
+			particles[i].y = particles[i].y + velocity/raw_rate*(cos(particles[i].theta)-cos(particles[i].theta+yaw_rate*delta_t));
+			particles[i].theta = particles.theta + yaw_rate*delta_t;
+		}
 
 		// Add random Gaussian noise.
-
+		particles[i].x = dist_x(gen);
+		particles[i].y = dist_y(gen);
+		particles[i].theta = dist_theta(gen);
 
 	}
 
