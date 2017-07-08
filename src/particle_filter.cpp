@@ -87,25 +87,26 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 	// Add measurements to each particle.
 	for (int i=0; i<num_particles; i++)
 	{
+		Particle &particle = particles[i];
 
 		if (yaw_rate == 0)
 		{
-			particles[i].x = particles[i].x + velocity * delta_t * cos(particles[i].theta);
-			particles[i].y = particles[i].y + velocity * delta_t * sin(particles[i].theta);
+			particle.x += velocity * delta_t * cos(particle.theta);
+			particle.y += velocity * delta_t * sin(particle.theta);
 		}
 		else
 		{
 			double y = velocity / yaw_rate;
-			double new_theta = particles[i].theta + yaw_rate * delta_t;
-			particles[i].x = particles[i].x + y * ( sin(new_theta) - sin(particles[i].theta) );
-			particles[i].y = particles[i].y + y * ( cos(particles[i].theta) - cos(new_theta) );
+			double new_theta = particle.theta + yaw_rate * delta_t;
+			particle.x += y * ( sin(new_theta) - sin(particle.theta) );
+			particle.y += y * ( cos(particle.theta) - cos(new_theta) );
 			particles[i].theta = new_theta;
 		}
 
 		// Add random Gaussian noise.
-		particles[i].x = dist_x(gen);
-		particles[i].y = dist_y(gen);
-		particles[i].theta = dist_theta(gen);
+		particle.x = dist_x(gen);
+		particle.y = dist_y(gen);
+		particle.theta = dist_theta(gen);
 
 	}
 
@@ -139,11 +140,35 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 	//   http://planning.cs.uiuc.edu/node99.html
 
 	// Update the weights of each particle using a mult-variate Gaussian distribution.
-	for (int i=0; i<observations.size(); i++)
-	{
-		LandmarkObs trans_obs;
-		obs = observations[i];
+	//vector<int> associations;
+	//vector<double> sense_x;
+	//vector<double> sense_y;
 
+	for (int i=0; i<num_particles; i++)
+	{
+		Particles &particle = *particles[i];
+		vector<LandmarkObs> trans_observations;
+		LandmarkObs obs;
+
+		for (int j=0; j<observations.size(); j++)
+		{
+			LandmarkObs trans_obs;
+			obs = observations[j];
+
+			double cos_theta = cos(particle.theta);
+			double sin_theta = sin(particle.theta);
+			trans_obs.x = particle.x + (obs.x*cos_theta - obs.y*sin_theta);
+			trans_obs.y = particle.y + (obs.x*sin_theta + obs.y*cos_theta);
+			trans_obs.id = obs.id;
+			trans_observations.push_back(trans_obs);
+		}
+
+		particles[p].weight = 1.0;
+
+		for (int i=0; i<trans_observations.size(); i++)
+		{
+
+		}
 
 	}
 
