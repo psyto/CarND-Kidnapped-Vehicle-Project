@@ -95,9 +95,11 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 		}
 		else
 		{
-			particles[i].x = particles[i].x + velocity/yaw_rate*(sin(particles[i].theta+yaw_rate*delta_t)-sin(particles[i].theta));
-			particles[i].y = particles[i].y + velocity/raw_rate*(cos(particles[i].theta)-cos(particles[i].theta+yaw_rate*delta_t));
-			particles[i].theta = particles.theta + yaw_rate*delta_t;
+			double y = velocity / yaw_rate;
+			double new_theta = particles[i].theta + yaw_rate * delta_t;
+			particles[i].x = particles[i].x + y * ( sin(new_theta) - sin(particles[i].theta) );
+			particles[i].y = particles[i].y + y * ( cos(particles[i].theta) - cos(new_theta) );
+			particles[i].theta = new_theta;
 		}
 
 		// Add random Gaussian noise.
@@ -137,8 +139,11 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 	//   http://planning.cs.uiuc.edu/node99.html
 
 	// Update the weights of each particle using a mult-variate Gaussian distribution.
-	for (int i=0; i<num_particles; i++)
+	for (int i=0; i<observations.size(); i++)
 	{
+		LandmarkObs trans_obs;
+		obs = observations[i];
+
 
 	}
 
