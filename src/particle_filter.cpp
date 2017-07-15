@@ -119,10 +119,16 @@ void ParticleFilter::dataAssociation(std::vector<LandmarkObs> predicted, std::ve
 	//   implement this method and use it as a helper during the updateWeights phase.
 
 	// Find the predicted measurement that is closest to each observed measurement.
+	for (LandmarkObs observation : observations)
+	{
+		for (LandmarkObs pred : predicated)
+		{
+
+			// Assign the observed measurement to this particular landmark.
 
 
-	// Assign the observed measurement to this particular landmark.
-
+		}
+	}
 
 }
 
@@ -150,10 +156,9 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 		vector<LandmarkObs> trans_observations;
 		LandmarkObs obs;
 
-		for (int j=0; j<observations.size(); j++)
+		for (LandmarkObs obs : observations)
 		{
 			LandmarkObs trans_obs;
-			obs = observations[j];
 
 			double cos_theta = cos(particle.theta);
 			double sin_theta = sin(particle.theta);
@@ -166,9 +171,9 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 		particles[p].weight = 1.0;
 
 		// Find landmarks within sensor range
-		for (int k=0; k<map_landmarks.landmark_list.size(); k++)
+		for (auto land : map_landmarks.landmark_list)
 		{
-			double error = dist(trans_obs.x, trans_obs.y, map_landmarks.landmark_list[k].x_f, map_landmarks.landmark_list[k].y_f);
+			double error = dist(trans_obs.x, trans_obs.y, land.x_f, land.y_f);
 			if (error < sensor_range)
 			{
 
@@ -180,7 +185,10 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 
 		// Calculating the particle's final weight
 		// Update the weights of each particle using a mult-variate Gaussian distribution.
-
+		double num = exp(-0.5 * ( pow((trans_observations.x - landmark.x_f), 2) / pow(std_landmark[0], 2) +
+															pow((trans_observations.y - landmark.y_f), 2) / oow(std_landmark[1], 2)));
+		double denom = 2 * M_PI * std_landmark[0] * std_landmark[1];
+		wt *= num / denom;
 
 	}
 
