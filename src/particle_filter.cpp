@@ -143,7 +143,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 	//vector<double> sense_x;
 	//vector<double> sense_y;
 
-	// Transformation: Tranform observations from car coordinate to map coordinate
+	// Transformation: For each particles, tranform observations from car coordinate to map coordinate
 	for (int i=0; i<num_particles; i++)
 	{
 		Particles &particle = *particles[i];
@@ -165,17 +165,24 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 
 		particles[p].weight = 1.0;
 
+		// Find landmarks within sensor range
+		for (int k=0; k<map_landmarks.landmark_list.size(); k++)
+		{
+			double error = dist(trans_obs.x, trans_obs.y, map_landmarks.landmark_list[k].x_f, map_landmarks.landmark_list[k].y_f);
+			if (error < sensor_range)
+			{
+
+			}
+		}
+
+		// Association: Associate the closest landmark to each tranformed observation
+		dataAssociation();
+
+		// Calculating the particle's final weight
+		// Update the weights of each particle using a mult-variate Gaussian distribution.
+
+
 	}
-
-	// Association: Associate the closest landmark to each tranformed observation
-	for (int j=0; j<observations.size(); j++)
-	{
-
-	}
-
-	// Calculating the particle's final weight
-	// Update the weights of each particle using a mult-variate Gaussian distribution.
-
 
 }
 
