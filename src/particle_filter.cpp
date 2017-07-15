@@ -120,7 +120,7 @@ void ParticleFilter::dataAssociation(std::vector<LandmarkObs> predicted, std::ve
 
 	for (LandmarkObs obs : observations)
 	{
-		double min_dist = std::numeric_limits<double>::max();
+		double min_dist = numeric_limits<double>::max();
 
 		for (LandmarkObs pred : predicted)
 		{
@@ -152,13 +152,13 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 	//vector<double> sense_x;
 	//vector<double> sense_y;
 
-	// Transformation: For each particles, tranform observations from car coordinate to map coordinate
 	for (int i=0; i<num_particles; i++)
 	{
 		Particles &particle = *particles[i];
 		vector<LandmarkObs> trans_observations;
 		vector<LandmarkObs> found_landmarks;
 
+		// Transform observations from car coordinate to map coordinate
 		for (LandmarkObs obs : observations)
 		{
 			LandmarkObs trans_obs;
@@ -186,11 +186,14 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 			}
 		}
 
-		// Association: Associate the closest landmark to each tranformed observation
+		// Associate the closest landmark to each tranformed observation
 		dataAssociation(found_landmarks, trans_observations);
 
 		// Calculating the particle's final weight
 		// Update the weights of each particle using a mult-variate Gaussian distribution.
+		double std_x = std_landmark[0];
+		double std_y = std_landmark[1];
+
 		double num = exp(-0.5 * ( pow((trans_observations.x - landmark.x_f), 2) / pow(std_landmark[0], 2) +
 															pow((trans_observations.y - landmark.y_f), 2) / oow(std_landmark[1], 2)));
 		double denom = 2 * M_PI * std_landmark[0] * std_landmark[1];
@@ -207,9 +210,14 @@ void ParticleFilter::resample() {
 
 	// Resample particles with replacement with probability proportional to their weight.
 	// std::discrete_distribution
+	default_random_engine gen;
+	discrete_distribution<int> discrete_dist(weights.begin(), weights.end());
+	vector<Particle> resampled_particles;
+
 	for (int i=0; i<num_particles; i++)
 	{
-
+		auto new_id = discrete_dist(gen);
+		resampled_particles.pushback(particles[new_id]);
 	}
 
 }
