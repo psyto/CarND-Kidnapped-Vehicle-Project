@@ -118,15 +118,18 @@ void ParticleFilter::dataAssociation(std::vector<LandmarkObs> predicted, std::ve
 	// NOTE: this method will NOT be called by the grading code. But you will probably find it useful to
 	//   implement this method and use it as a helper during the updateWeights phase.
 
-	// Find the predicted measurement that is closest to each observed measurement.
-	for (LandmarkObs observation : observations)
+	for (LandmarkObs obs : observations)
 	{
-		for (LandmarkObs pred : predicated)
+		double min_dist = std::numeric_limits<double>::max();
+
+		for (LandmarkObs pred : predicted)
 		{
-
-			// Assign the observed measurement to this particular landmark.
-
-
+			double error = dist(obs.x, obs.y, pred.x, pred.y);
+			if (error < min_dist)
+			{
+				obs.id = pred.id;
+				min_dist = error;
+			}
 		}
 	}
 
@@ -154,7 +157,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 	{
 		Particles &particle = *particles[i];
 		vector<LandmarkObs> trans_observations;
-		LandmarkObs obs;
+		vector<LandmarkObs> found_landmarks;
 
 		for (LandmarkObs obs : observations)
 		{
@@ -168,20 +171,23 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 			trans_observations.push_back(trans_obs);
 		}
 
-		particles[p].weight = 1.0;
-
 		// Find landmarks within sensor range
-		for (auto land : map_landmarks.landmark_list)
+		for (auto lm : map_landmarks.landmark_list)
 		{
-			double error = dist(trans_obs.x, trans_obs.y, land.x_f, land.y_f);
+			double error = dist(particle.x, particle.y, lm.x_f, lm.y_f);
 			if (error < sensor_range)
 			{
+				LandmarkObs found_lm;
 
+				found_lm.x = lm.x_f;
+				found_lm.y = lm.y_f;
+				found_lm.id = lm.id_i;
+				found_landmarks.push_back(found_lm);
 			}
 		}
 
 		// Association: Associate the closest landmark to each tranformed observation
-		dataAssociation();
+		dataAssociation(found_landmarks, trans_observations);
 
 		// Calculating the particle's final weight
 		// Update the weights of each particle using a mult-variate Gaussian distribution.
