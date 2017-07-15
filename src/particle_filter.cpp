@@ -139,11 +139,11 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 	//   3.33
 	//   http://planning.cs.uiuc.edu/node99.html
 
-	// Update the weights of each particle using a mult-variate Gaussian distribution.
 	//vector<int> associations;
 	//vector<double> sense_x;
 	//vector<double> sense_y;
 
+	// Transformation: Tranform observations from car coordinate to map coordinate
 	for (int i=0; i<num_particles; i++)
 	{
 		Particles &particle = *particles[i];
@@ -165,12 +165,17 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 
 		particles[p].weight = 1.0;
 
-		for (int i=0; i<trans_observations.size(); i++)
-		{
+	}
 
-		}
+	// Association: Associate the closest landmark to each tranformed observation
+	for (int j=0; j<observations.size(); j++)
+	{
 
 	}
+
+	// Calculating the particle's final weight
+	// Update the weights of each particle using a mult-variate Gaussian distribution.
+
 
 }
 
