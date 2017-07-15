@@ -191,13 +191,25 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 
 		// Calculating the particle's final weight
 		// Update the weights of each particle using a mult-variate Gaussian distribution.
-		double std_x = std_landmark[0];
-		double std_y = std_landmark[1];
+		for (auto obs : trans_observations)
+		{
+			double x = found_landmarks[obs.id].x_f;
+			double y = found_landmarks[obs.id].y_f;
+			double mu_x = obs.x;
+			double mu_y = obs.y;
 
-		double num = exp(-0.5 * ( pow((trans_observations.x - landmark.x_f), 2) / pow(std_landmark[0], 2) +
-															pow((trans_observations.y - landmark.y_f), 2) / oow(std_landmark[1], 2)));
-		double denom = 2 * M_PI * std_landmark[0] * std_landmark[1];
-		wt *= num / denom;
+			double dx = x - mu_x;
+			double dy = y - mu_y;
+
+			double std_x = std_landmark[0];
+			double std_y = std_landmark[1];
+
+			double num = exp(-0.5 * (pow(dx, 2) / pow(std_x, 2)) + (pow(dy, 2) / pow(std_y, 2)));
+			double denom = 2 * M_PI * std_x * std_y;
+			wt *= num / denom;
+		}
+		weights += wt;
+		
 
 	}
 
