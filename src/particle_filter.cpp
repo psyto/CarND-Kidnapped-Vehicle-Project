@@ -155,7 +155,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 
 	for (int i=0; i<num_particles; i++)
 	{
-		Particles &particle = particles[i];
+		Particle &particle = particles[i];
 		vector<LandmarkObs> trans_observations;
 		vector<LandmarkObs> found_landmarks;
 		double wt = 1.0;
@@ -195,8 +195,8 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 		// Update the weights of each particle using a mult-variate Gaussian distribution.
 		for (auto obs : trans_observations)
 		{
-			double x = found_landmarks[obs.id].x_f;
-			double y = found_landmarks[obs.id].y_f;
+			double x = found_landmarks[obs.id].x;
+			double y = found_landmarks[obs.id].y;
 			double mu_x = obs.x;
 			double mu_y = obs.y;
 
@@ -219,9 +219,9 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 	// Normalize weights
 	for (int i=0; i<num_particles; i++)
 	{
-		Particles &particle = particles[i];
-		p.weight /= total_weights;
-		weights[i] = p.weight;
+		Particle &particle = particles[i];
+		particle.weight /= total_weights;
+		weights[i] = particle.weight;
 	}
 
 }
@@ -240,7 +240,7 @@ void ParticleFilter::resample() {
 	for (int i=0; i<num_particles; i++)
 	{
 		auto new_id = discrete_dist(gen);
-		resampled_particles.pushback(particles[new_id]);
+		resampled_particles.push_back(particles[new_id]);
 	}
 
 }
