@@ -151,12 +151,14 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 	//vector<int> associations;
 	//vector<double> sense_x;
 	//vector<double> sense_y;
+	double total_weights = 0.0;
 
 	for (int i=0; i<num_particles; i++)
 	{
-		Particles &particle = *particles[i];
+		Particles &particle = particles[i];
 		vector<LandmarkObs> trans_observations;
 		vector<LandmarkObs> found_landmarks;
+		double wt = 1.0;
 
 		// Transform observations from car coordinate to map coordinate
 		for (LandmarkObs obs : observations)
@@ -208,9 +210,18 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 			double denom = 2 * M_PI * std_x * std_y;
 			wt *= num / denom;
 		}
-		weights += wt;
-		
 
+		particle.weight = wt;
+		total_weights += wt;
+
+	}
+
+	// Normalize weights
+	for (int i=0; i<num_particles; i++)
+	{
+		Particles &particle = particles[i];
+		p.weight /= total_weights;
+		weights[i] = p.weight;
 	}
 
 }
