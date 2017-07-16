@@ -87,26 +87,24 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 	// Add measurements to each particle.
 	for (int i=0; i<num_particles; i++)
 	{
-		Particle &particle = particles[i];
-
 		if (yaw_rate == 0)
 		{
-			particle.x += velocity * delta_t * cos(particle.theta);
-			particle.y += velocity * delta_t * sin(particle.theta);
+			particles[i].x += velocity * delta_t * cos(particles[i].theta);
+			particles[i].y += velocity * delta_t * sin(particles[i].theta);
 		}
 		else
 		{
 			double y = velocity / yaw_rate;
-			double new_theta = particle.theta + yaw_rate * delta_t;
-			particle.x += y * ( sin(new_theta) - sin(particle.theta) );
-			particle.y += y * ( cos(particle.theta) - cos(new_theta) );
+			double new_theta = particles[i].theta + yaw_rate * delta_t;
+			particles[i].x += y * ( sin(new_theta) - sin(particles[i].theta) );
+			particles[i].y += y * ( cos(particles[i].theta) - cos(new_theta) );
 			particles[i].theta = new_theta;
 		}
 
 		// Add random Gaussian noise.
-		particle.x = dist_x(gen);
-		particle.y = dist_y(gen);
-		particle.theta = dist_theta(gen);
+		particles[i].x = dist_x(gen);
+		particles[i].y = dist_y(gen);
+		particles[i].theta = dist_theta(gen);
 
 	}
 
@@ -155,7 +153,6 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 
 	for (int i=0; i<num_particles; i++)
 	{
-		Particle &particle = particles[i];
 		vector<LandmarkObs> trans_observations;
 		vector<LandmarkObs> found_landmarks;
 		double wt = 1.0;
@@ -165,10 +162,10 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 		{
 			LandmarkObs trans_obs;
 
-			double cos_theta = cos(particle.theta);
-			double sin_theta = sin(particle.theta);
-			trans_obs.x = particle.x + (obs.x*cos_theta - obs.y*sin_theta);
-			trans_obs.y = particle.y + (obs.x*sin_theta + obs.y*cos_theta);
+			double cos_theta = cos(particles[i].theta);
+			double sin_theta = sin(particles[i].theta);
+			trans_obs.x = particles[i].x + (obs.x*cos_theta - obs.y*sin_theta);
+			trans_obs.y = particles[i].y + (obs.x*sin_theta + obs.y*cos_theta);
 			trans_obs.id = obs.id;
 			trans_observations.push_back(trans_obs);
 		}
@@ -176,7 +173,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 		// Find landmarks within sensor range
 		for (auto lm : map_landmarks.landmark_list)
 		{
-			double error = dist(particle.x, particle.y, lm.x_f, lm.y_f);
+			double error = dist(particles[i].x, particles[i].y, lm.x_f, lm.y_f);
 			if (error < sensor_range)
 			{
 				LandmarkObs found_lm;
@@ -211,18 +208,17 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 			wt *= num / denom;
 		}
 
-		particle.weight = wt;
+		particles[i].weight = wt;
 		total_weights += wt;
 
 	}
 
 	// Normalize weights
-	for (int i=0; i<num_particles; i++)
-	{
-		Particle &particle = particles[i];
-		particle.weight /= total_weights;
-		weights[i] = particle.weight;
-	}
+//	for (int i=0; i<num_particles; i++)
+//	{
+//		particles[i].weight /= total_weights;
+//		weights[i] = particles[i].weight;
+//	}
 
 }
 
